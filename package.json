@@ -4,7 +4,7 @@
   "description": "a graphQL server that make with node js and express",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "nodemon  /index.js/"
   },
   "repository": {
     "type": "git",
@@ -25,10 +25,15 @@
   "devDependencies": {
     "@babel/cli": "^7.18.10",
     "@babel/core": "^7.19.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.18.6",
     "@babel/preset-env": "^7.19.0",
-    "@babel/register": "^7.18.9"
+    "@babel/register": "^7.18.9",
+    "dotenv": "^16.0.2",
+    "nodemon": "^2.0.19"
   },
   "dependencies": {
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "express-graphql": "^0.12.0",
+    "graphql": "^15.8.0"
   }
 }

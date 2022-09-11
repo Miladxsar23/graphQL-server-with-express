@@ -1,2 +1,2 @@
-require("@babel/register")
-console.log("salam" + "khoobi")
+require("@babel/register");
+require("./server");
