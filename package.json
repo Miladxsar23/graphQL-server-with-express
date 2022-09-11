@@ -4,7 +4,7 @@
   "description": "a graphQL server that make with node js and express",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon  /index.js/"
+    "server": "nodemon"
   },
   "repository": {
     "type": "git",
