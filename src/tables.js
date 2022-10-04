@@ -1,4 +1,4 @@
-const sql = require("sql");
+import sql from "sql";
 // set the SQL dialect
 sql.setDialect("sqlite");
 
@@ -70,4 +70,4 @@ const posts = sql.define({
   ],
 });
 
-module.exports = { posts, users, usersFriends };
+export { posts, users, usersFriends };
