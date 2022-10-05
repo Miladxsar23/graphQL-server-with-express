@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "a graphQL server that make with node js and express",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "server": "nodemon"
   },

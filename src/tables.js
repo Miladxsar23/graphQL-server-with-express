@@ -5,7 +5,7 @@ sql.setDialect("sqlite");
 // TABLES:
 
 //// -- Users
-const users = sql.define({
+export const users = sql.define({
   name: "users",
   columns: [
     {
@@ -24,7 +24,7 @@ const users = sql.define({
   ],
 });
 //// --- usersFriends
-const usersFriends = sql.define({
+export const usersFriends = sql.define({
   name: "users_friends",
   columns: [
     {
@@ -43,7 +43,7 @@ const usersFriends = sql.define({
 });
 
 //// --- posts
-const posts = sql.define({
+export const posts = sql.define({
   name: "posts",
   columns: [
     {
@@ -64,10 +64,10 @@ const posts = sql.define({
       dataType: "text",
     },
     {
-      name: "create_at",
+      name: "created_at",
       dataType: "dateTime",
     },
   ],
 });
 
-export { posts, users, usersFriends };
+
