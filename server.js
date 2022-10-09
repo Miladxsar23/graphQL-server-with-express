@@ -30,6 +30,7 @@ const RootQuery = new GraphQLObjectType({
         }
       }, 
       resolve(source, args) {
+        console.log(source, args)
         return inMemoryStore[args.id]
       }
     }
@@ -53,7 +54,6 @@ const RoouMutation = new GraphQLObjectType({
       }, 
       resolve(source, args) {
         inMemoryStore[args.id] = args.value
-        console.log(inMemoryStore)
         return inMemoryStore[args.id]
       }
     }
