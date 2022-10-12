@@ -70,4 +70,12 @@ export const posts = sql.define({
   ],
 });
 
+// helper functions
+export const dbIdToNodeId = (id, tableName) => {
+  return `${tableName}:${id}`;
+};
 
+export const splitNodeId = (nodeId) => {
+  const [tableName, dbId] = nodeId.split(":");
+  return { tableName, dbId };
+};

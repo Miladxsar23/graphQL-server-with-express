@@ -1,28 +1,31 @@
 import {
   GraphQLID,
-  GraphQLInterfaceType,
-  GraphQLObjectType,
   GraphQLNonNull,
+  GraphQLObjectType,
   GraphQLString,
+  GraphQLInterfaceType,
   GraphQLList,
 } from "graphql";
 
-import * as tables from "./tables";
+import * as tables from "./tables.js";
+
+// Node Interface
 export const NodeInterface = new GraphQLInterfaceType({
   name: "Node",
   fields: {
-    id: new GraphQLNonNull(GraphQLID),
+    id: {
+      type: new GraphQLNonNull(GraphQLID),
+    },
   },
-  resolveType(source) {
-    if (source.__tablename === tables.users.getName) return UserType;
-    return PostType;
+  resolveType : (source) => {
+    if (source.__tableName === tables.users.getName()) return UserType;
+    else return PostType;
   },
 });
-
+// User Type
 const resolveId = (source) => {
-  return tables.dbIdToNodeId(source.id, source.__tablename);
+  return tables.dbIdToNodeId(source.id, source.__tableName);
 };
-
 export const UserType = new GraphQLObjectType({
   name: "User",
   interfaces: [NodeInterface],
@@ -39,6 +42,8 @@ export const UserType = new GraphQLObjectType({
     },
   },
 });
+
+// Post Type
 export const PostType = new GraphQLObjectType({
   name: "Post",
   interfaces: [NodeInterface],
@@ -47,7 +52,7 @@ export const PostType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLID),
       resolve: resolveId,
     },
-    createdAt: {
+    createAt: {
       type: new GraphQLNonNull(GraphQLString),
     },
     body: {

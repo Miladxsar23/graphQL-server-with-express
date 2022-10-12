@@ -1,73 +1,38 @@
 // dependencies
-const express = require("express");
-const { graphqlHTTP } = require("express-graphql");
-const {
-  GraphQLObjectType,
-  GraphQLSchema,
-  GraphQLString,
+import express from "express";
+import { graphqlHTTP } from "express-graphql";
+import { NodeInterface, UserType, PostType } from "./src/types.js";
+import * as loaders from "./src/loaders.js";
+import {
   GraphQLID,
   GraphQLNonNull,
-} = require("graphql");
-// server configurations
-const server = express();
-const port = 3000;
-// ----- Root Query
+  GraphQLObjectType,
+  GraphQLSchema,
+} from "graphql";
+
 const RootQuery = new GraphQLObjectType({
   name: "RootQuery",
-  description: "the root Query",
+  description: "the root query",
   fields: {
-    viewer: {
-      type: GraphQLString,
-      resolve() {
-        return "viewer";
+    node: {
+      type: NodeInterface,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLID),
+        },
+      },
+      resolve(source, args) {
+        return loaders.getNodeById(args.id);
       },
     },
-    node: {
-      type : GraphQLString, 
-      args : {
-        id : {
-          type : new GraphQLNonNull(GraphQLID)
-        }
-      }, 
-      resolve(source, args) {
-        console.log(source, args)
-        return inMemoryStore[args.id]
-      }
-    }
   },
 });
-// ------- Mutations
-let inMemoryStore = Object.create(null)
-const RoouMutation = new GraphQLObjectType({
-  name : "RootMutation", 
-  description : "the root mutation", 
-  fields : {
-    setNode : {
-      type : GraphQLString, 
-      args : {
-        id : {
-          type : new GraphQLNonNull(GraphQLID)
-        }, 
-        value : {
-          type : new GraphQLNonNull(GraphQLString)
-        }
-      }, 
-      resolve(source, args) {
-        inMemoryStore[args.id] = args.value
-        return inMemoryStore[args.id]
-      }
-    }
-  }
-})
 
-//  ------- Schema
 const Schema = new GraphQLSchema({
   query: RootQuery,
-  mutation : RoouMutation
+  types: [UserType, PostType],
 });
 
-server.use("/graphql", graphqlHTTP({ schema: Schema, graphiql: true }));
-
-server.listen(port, () => {
-  console.log("server run in http://localhost:3000");
-});
+const app = express();
+app.use("/graphql", graphqlHTTP({ schema: Schema, graphiql: true }));
+export default app;
