@@ -22,7 +22,7 @@ const RootQuery = new GraphQLObjectType({
         },
       },
       resolve(source, args) {
-        return loaders.getNodeById(args.id);
+        return loaders.getNodeById(args.id)
       },
     },
   },

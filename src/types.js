@@ -8,6 +8,7 @@ import {
 } from "graphql";
 
 import * as tables from "./tables.js";
+import * as loaders from "./loaders.js";
 
 // Node Interface
 export const NodeInterface = new GraphQLInterfaceType({
@@ -17,7 +18,7 @@ export const NodeInterface = new GraphQLInterfaceType({
       type: new GraphQLNonNull(GraphQLID),
     },
   },
-  resolveType : (source) => {
+  resolveType: (source) => {
     if (source.__tableName === tables.users.getName()) return UserType;
     else return PostType;
   },
@@ -40,6 +41,16 @@ export const UserType = new GraphQLObjectType({
     about: {
       type: new GraphQLNonNull(GraphQLString),
     },
+    friends: {
+      type: new GraphQLList(GraphQLID),
+      resolve(obj) {
+        return loaders.getFriendIdsFromUser(obj).then((rows) => {
+          return rows.map((row) => {
+            return tables.dbIdToNodeId(row.user_id_b, row.__tableName);
+          });
+        });
+      },
+    },
   },
 });
 
@@ -54,6 +65,9 @@ export const PostType = new GraphQLObjectType({
     },
     createAt: {
       type: new GraphQLNonNull(GraphQLString),
+      resolve(obj) {
+        return obj["created_at"];
+      },
     },
     body: {
       type: new GraphQLNonNull(GraphQLString),
