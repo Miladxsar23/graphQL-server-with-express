@@ -31,4 +31,34 @@ export const getFriendIdsFromUser = (userSource) => {
     });
     return rows;
   });
-}; 
+};
+
+export const getUserNodeWithFriends = (nodeId) => {
+  const { tableName, dbId } = tables.splitNodeId(nodeId);
+  const query = tables.users
+    .select(tables.usersFriends.user_id_b, tables.users.star())
+    .from(
+      tables.users
+        .leftJoin(tables.usersFriends)
+        .on(tables.usersFriends.user_id_a.equals(dbId))
+    )
+    .where(tables.users.id.equals(dbId))
+    .toQuery();
+  return database.getSql(query).then((rows) => {
+    if (!rows[0]) return undefined;
+    const __friends = rows.map((row) => {
+      return {
+        user_id_b: row.user_id_b,
+        __tableName: tables.users.getName(),
+      };
+    });
+    const source = {
+      id: rows[0].id,
+      name: rows[0].name,
+      about: rows[0].about,
+      __friends,
+      __tableName: tableName,
+    };
+    return source;
+  });
+};

@@ -21,8 +21,24 @@ const RootQuery = new GraphQLObjectType({
           type: new GraphQLNonNull(GraphQLID),
         },
       },
-      resolve(source, args) {
-        return loaders.getNodeById(args.id)
+      resolve(source, args, context, info) {
+        let includeFriend = false;
+        const selectionFragments = info.fieldNodes[0].selectionSet.selections;
+        const userSelections = selectionFragments.filter((selection) => {
+          return (
+            selection.kind === "InlineFragment" &&
+            selection.typeCondition.name.value === "User"
+          );
+        });
+        userSelections.forEach((selection) => {
+          selection.selectionSet.selections.forEach((innerSelection) => {
+            if (innerSelection.name.value === "friends") {
+              includeFriend = true;
+            }
+          });
+        });
+        if (includeFriend) return loaders.getUserNodeWithFriends(args.id);
+        else return loaders.getNodeById(args.id);
       },
     },
   },

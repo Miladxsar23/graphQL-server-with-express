@@ -43,8 +43,13 @@ export const UserType = new GraphQLObjectType({
     },
     friends: {
       type: new GraphQLList(GraphQLID),
-      resolve(obj) {
-        return loaders.getFriendIdsFromUser(obj).then((rows) => {
+      resolve(source) {
+        if (source.__friends) {
+          return source.__friends.map((friend) => {
+            return tables.dbIdToNodeId(friend.user_id_b, friend.__tableName);
+          });
+        }
+        return loaders.getFriendIdsFromUser(source).then((rows) => {
           return rows.map((row) => {
             return tables.dbIdToNodeId(row.user_id_b, row.__tableName);
           });
