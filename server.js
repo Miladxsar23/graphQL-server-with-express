@@ -22,23 +22,24 @@ const RootQuery = new GraphQLObjectType({
         },
       },
       resolve(source, args, context, info) {
-        let includeFriend = false;
-        const selectionFragments = info.fieldNodes[0].selectionSet.selections;
-        const userSelections = selectionFragments.filter((selection) => {
-          return (
-            selection.kind === "InlineFragment" &&
-            selection.typeCondition.name.value === "User"
-          );
-        });
-        userSelections.forEach((selection) => {
-          selection.selectionSet.selections.forEach((innerSelection) => {
-            if (innerSelection.name.value === "friends") {
-              includeFriend = true;
-            }
-          });
-        });
-        if (includeFriend) return loaders.getUserNodeWithFriends(args.id);
-        else return loaders.getNodeById(args.id);
+        // let includeFriend = false;
+        // const selectionFragments = info.fieldNodes[0].selectionSet.selections;
+        // const userSelections = selectionFragments.filter((selection) => {
+        //   return (
+        //     selection.kind === "InlineFragment" &&
+        //     selection.typeCondition.name.value === "User"
+        //   );
+        // });
+        // userSelections.forEach((selection) => {
+        //   selection.selectionSet.selections.forEach((innerSelection) => {
+        //     if (innerSelection.name.value === "friends") {
+        //       includeFriend = true;
+        //     }
+        //   });
+        // });
+        // if (includeFriend) return loaders.getUserNodeWithFriends(args.id);
+        // else return loaders.getNodeById(args.id);
+        return loaders.getNodeById(args.id);
       },
     },
   },
