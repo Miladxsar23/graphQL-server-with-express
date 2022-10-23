@@ -1,5 +1,6 @@
 // dependencies
 import express from "express";
+import basicAuth from 'basic-auth-connect'
 import { graphqlHTTP } from "express-graphql";
 import { NodeInterface, UserType, PostType } from "./src/types.js";
 import * as loaders from "./src/loaders.js";
@@ -51,5 +52,10 @@ const Schema = new GraphQLSchema({
 });
 
 const app = express();
+// Set basic authentication method as middleware for api
+app.use(basicAuth(function(user, pass) {
+  console.log(pass)
+    return pass === "mypassword1"
+}))
 app.use("/graphql", graphqlHTTP({ schema: Schema, graphiql: true }));
 export default app;

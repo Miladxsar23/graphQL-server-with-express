@@ -94,20 +94,22 @@ export const UserType = new GraphQLObjectType({
           },
         },
         resolve: (source, args, context, info) => {
-          return loaders.getPostIdsForUser(source, args).then(({ rows, pageInfo }) => {
-            const promises = rows.map((row) => {
-              const postNodeId = tables.dbIdToNodeId(row.id, row.__tableName);
-              return loaders.getNodeById(postNodeId).then((node) => {
-                return { node, cursor: row.__cursor };
+          return loaders
+            .getPostIdsForUser(source, args)
+            .then(({ rows, pageInfo }) => {
+              const promises = rows.map((row) => {
+                const postNodeId = tables.dbIdToNodeId(row.id, row.__tableName);
+                return loaders.getNodeById(postNodeId).then((node) => {
+                  return { node, cursor: row.__cursor };
+                });
+              });
+              return Promise.all(promises).then((edges) => {
+                return {
+                  edges,
+                  pageInfo,
+                };
               });
             });
-            return Promise.all(promises).then((edges) => {
-              return {
-                edges,
-                pageInfo,
-              };
-            });
-          });
         },
       },
     };
