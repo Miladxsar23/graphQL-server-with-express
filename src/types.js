@@ -95,7 +95,7 @@ export const UserType = new GraphQLObjectType({
         },
         resolve: (source, args, context, info) => {
           return loaders
-            .getPostIdsForUser(source, args)
+            .getPostIdsForUser(source, args, context)
             .then(({ rows, pageInfo }) => {
               const promises = rows.map((row) => {
                 const postNodeId = tables.dbIdToNodeId(row.id, row.__tableName);

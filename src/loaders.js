@@ -62,8 +62,8 @@ export const getUserNodeWithFriends = (nodeId) => {
     return source;
   });
 };
-
-export const getPostIdsForUser = (source, args) => {
+// post list loader
+export const getPostIdsForUser = (source, args, context) => {
   let { first, after } = args;
   //default length
   if (!first) first = 2;
@@ -71,16 +71,25 @@ export const getPostIdsForUser = (source, args) => {
   const table = tables.posts;
   //create query to read list of post ids
   let query = table
-    .select(table.id, table.created_at)
+    .select(table.id, table.created_at, table.level)
     .where(table.user_id.equals(source.id))
     .order(table.created_at.asc)
-    .limit(first + 1);
+    .limit(first + 10);
 
   if (after) {
     const [id, created_at] = after.split(":");
     query = query.where(table.created_at.gt(created_at)).where(table.id.gt(id));
   }
-  return database.getSql(query.toQuery()).then((allRows) => {
+  return Promise.all([
+    database.getSql(query.toQuery()),
+    getFriendshipLevels(context),
+  ]).then(([allRows, friendShipLevels]) => {
+    console.log(friendShipLevels)
+    if (tables.dbIdToNodeId(source.id, tables.users.getName()) !== context) {
+      allRows = allRows.filter((row) => {
+        return canAccessLevel(friendShipLevels[source.id], row.level);
+      });
+    }
     let rows = allRows.slice(0, first);
     rows.forEach((row) => {
       row.__tableName = tables.posts.getName();
@@ -96,6 +105,30 @@ export const getPostIdsForUser = (source, args) => {
       pageInfo.startCursor = rows[0].__cursor;
       pageInfo.endCursor = rows[rows.length - 1].__cursor;
     }
-    return {rows, pageInfo}
+    return { rows, pageInfo };
   });
+};
+
+// friendship level helper function
+const getFriendshipLevels = (nodeId) => {
+  const { dbId } = tables.splitNodeId(nodeId);
+  const table = tables.usersFriends;
+  const query = table.select(table.star()).where(table.user_id_a.equals(dbId));
+  return database.getSql(query.toQuery()).then((rows) => {
+    let levelMap = {};
+    rows.forEach((row) => {
+      levelMap[row.user_id_b] = row.level;
+    });
+    return levelMap;
+  });
+};
+
+// can Access Level function
+const canAccessLevel = (viewerLevel, contentLevel) => {
+  const levels = ["public", "acquaintance", "friend", "top"];
+  const viewerLevelIndex = levels.indexOf(viewerLevel);
+  const contentLevelIndex = levels.indexOf(contentLevel);
+  console.log(viewerLevelIndex, contentLevelIndex);
+  console.log(viewerLevel, contentLevel);
+  return viewerLevelIndex >= contentLevelIndex;
 };
